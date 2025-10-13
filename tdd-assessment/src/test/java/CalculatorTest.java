@@ -1,12 +1,12 @@
-package test.java;
+package src.test.java;
 
-import java.beans.Transient;
-
-public class CalculatorTest { 
-    //test2
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import src.main.java.Calculator;
+public class CalculatorTest {
     @Test
     void testAdd(){
-        Calculator c = new Calculator(); 
-        assertEquals(5, c.add(2, 3)); 
+        Calculator c = new Calculator();
+        assertEquals(5, c.add(2, 3));
     }
 }
