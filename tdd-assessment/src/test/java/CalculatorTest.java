@@ -1,5 +1,4 @@
 package src.test.java;
-
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import src.main.java.Calculator;
