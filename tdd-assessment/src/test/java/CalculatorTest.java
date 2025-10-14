@@ -10,8 +10,8 @@ public class CalculatorTest {
     }
     @Test //test 2
     void testSubtract() { 
-    Calculator c = new Calculator(); 
-    assertEquals(5, c.subtract(8, 3)); 
-} 
+        Calculator c = new Calculator(); 
+        assertEquals(5, c.subtract(8, 3)); 
+    } 
 
 }
