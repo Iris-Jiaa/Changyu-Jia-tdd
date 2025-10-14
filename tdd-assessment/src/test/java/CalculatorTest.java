@@ -14,4 +14,10 @@ public class CalculatorTest {
         assertEquals(5, c.subtract(8, 3)); 
     } 
 
+    @Test 
+    void testMultiply() { 
+        Calculator c = new Calculator(); 
+        assertEquals(24, c.multiply(8, 3)); 
+    }
+
 }
