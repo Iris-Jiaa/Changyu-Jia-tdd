@@ -34,6 +34,11 @@ public class CalculatorTest {
     void divide_parameterizedTest(int dividend, int divisor, int expected) {
         assertEquals(expected, c.divide(dividend, divisor));
     }
+
+    @Test
+    void divide_DivisorIsZero() {
+        assertThrows(IllegalArgumentException.class, () -> c.divide(10, 0));
+    }
 }
 
 
