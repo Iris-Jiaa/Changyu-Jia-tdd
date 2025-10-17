@@ -13,6 +13,9 @@ public class Calculator {
         return result;
     }
     public int divide(int dividend, int divisor) {
+        if (divisor == 0) {
+            throw new IllegalArgumentException("Divisor cannot be zero");
+        }
         int result = dividend / divisor;
         return result;
     } 
