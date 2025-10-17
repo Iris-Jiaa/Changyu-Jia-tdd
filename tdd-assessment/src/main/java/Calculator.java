@@ -13,6 +13,7 @@ public class Calculator {
         return result;
     }
     public int divide(int dividend, int divisor) {
-        return 2; 
+        int result = dividend / divisor;
+        return result;
     } 
 }
