@@ -17,5 +17,16 @@ public class ReservationServiceTest {
         reservationRepo = new MemoryReservationRepository();
         reservationService = new ReservationService(bookRepo, reservationRepo);
     }
+    
+    @Test // 1. happy path
+    void reserve_succeeds_whenCopiesAvailable() {
+        Book book = new Book("book1", "Some Title", 2);
+        bookRepo.save(book);
+        reservationService.reserve("user1", "book1");
+        assertEquals(1, bookRepo.findById("book1").getCopies());
+        assertTrue(reservationRepo.existsByUserAndBook("user1", "book1"));
+    }
+
+
 }
 
