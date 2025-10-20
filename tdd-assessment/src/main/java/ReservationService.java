@@ -23,6 +23,9 @@ already reserved.
         if (book.getCopies() <= 0) {
             throw new NoAvailableCopiesException("No copies available");
         }
+        if (reservationRepo.existsByUserAndBook(userId, bookId)) {
+            throw new IllegalStateException("User already reserved this book");
+        }
         book.setCopies(book.getCopies() - 1);
         bookRepo.save(book);
         reservationRepo.save(new Reservation(userId, bookId));
