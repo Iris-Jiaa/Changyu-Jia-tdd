@@ -16,7 +16,10 @@ public class ReservationService {
 already reserved. 
 */ 
     public void reserve(String userId, String bookId) { 
-        // TODO: Implement using TDD 
+        Book book = bookRepo.findById(bookId);
+        book.setCopies(book.getCopies() - 1);
+        bookRepo.save(book);
+        reservationRepo.save(new Reservation(userId, bookId));
     } 
 /** 
 * Cancel an existing reservation for a user. 
