@@ -58,6 +58,14 @@ public class ReservationServiceTest {
         reservationService.cancel(userId, "book1");
         assertEquals(2, bookRepo.findById("book1").getCopies());
     }
+    @Test
+    void cancel_whenUserExistsButNoReservation() {
+        Book book = new Book("book1", "Test Book", 1);
+        bookRepo.save(book);
+    
+        assertThrows(IllegalArgumentException.class, 
+            () -> reservationService.cancel("user1", "book1"));
+}
     
 
 
