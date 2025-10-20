@@ -34,13 +34,21 @@ public class ReservationServiceTest {
             reservationService.reserve("user2", "book2");
         });
     }
-    @Test
+    @Test // 3. book not found
     void reserve_whenBookNotFound() {
         String userId = "user1";
         String nonExistentBookId = "nonexistent";
         assertThrows(IllegalArgumentException.class, 
-            () -> reservationService.reserve(userId, nonExistentBookId));
-}
+            () -> reservationService.reserve("user1", "nonexistent"));
+    }
+    @Test // 4.  A user cannot reserve the same book twice. 
+    void reserve_shouldThrowExceptionWhenUserAlreadyReserved() {
+        Book book = new Book("book1", "Test Book", 2);
+        bookRepo.save(book);
+        reservationService.reserve("user1", "book1");
+        assertThrows(IllegalStateException.class, 
+            () -> reservationService.reserve("user1", "book1"));
+    }
 
 
 
