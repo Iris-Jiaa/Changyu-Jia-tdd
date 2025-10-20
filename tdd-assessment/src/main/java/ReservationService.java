@@ -35,6 +35,9 @@ already reserved.
 * Throws IllegalArgumentException if no such reservation exists. 
 */ 
     public void cancel(String userId, String bookId) {
+        if (!reservationRepo.existsByUserAndBook(userId, bookId)) {
+            throw new IllegalArgumentException("No such reservation exists");
+        }
         reservationRepo.delete(userId, bookId);
         Book book = bookRepo.findById(bookId);
         book.setCopies(book.getCopies() + 1);
