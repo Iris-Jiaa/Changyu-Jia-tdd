@@ -26,6 +26,14 @@ public class ReservationServiceTest {
         assertEquals(1, bookRepo.findById("book1").getCopies());
         assertTrue(reservationRepo.existsByUserAndBook("user1", "book1"));
     }
+    @Test // 2. no copies available
+    void reserve_fails_whenNoCopiesAvailable() {
+        Book book = new Book("book2", "Title", 0);
+        bookRepo.save(book);
+        assertThrows(IllegalArgumentException.class, () -> {
+            reservationService.reserve("user2", "book2");
+        });
+    }
 
 
 }
