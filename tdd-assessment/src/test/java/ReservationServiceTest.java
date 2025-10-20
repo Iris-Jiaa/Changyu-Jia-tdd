@@ -3,6 +3,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.List;
+
 import src.main.java.*;
 
 
@@ -30,9 +32,8 @@ public class ReservationServiceTest {
     void reserve_fails_whenNoCopiesAvailable() {
         Book book = new Book("book2", "Title", 0);
         bookRepo.save(book);
-        assertThrows(NoAvailableCopiesException.class, () -> {
-            reservationService.reserve("user2", "book2");
-        });
+        assertThrows(NoAvailableCopiesException.class,
+            () -> reservationService.reserve("user2", "book2"));
     }
     @Test // 3. book not found
     void reserve_whenBookNotFound() {
@@ -58,15 +59,26 @@ public class ReservationServiceTest {
         reservationService.cancel(userId, "book1");
         assertEquals(2, bookRepo.findById("book1").getCopies());
     }
-    @Test
+    @Test // 6. cancel reservation fails when no such reservation exists
     void cancel_whenUserExistsButNoReservation() {
         Book book = new Book("book1", "Test Book", 1);
         bookRepo.save(book);
     
         assertThrows(IllegalArgumentException.class, 
             () -> reservationService.cancel("user1", "book1"));
-}
-    
+    }
+    @Test // 7. list reservations for a user
+    void listReservations_userReservations() {
+        Book book1 = new Book("book1", "Book 1", 2);
+        Book book2 = new Book("book2", "Book 2", 1);
+        bookRepo.save(book1);
+        bookRepo.save(book2);
+        reservationService.reserve("user1", "book1");
+        reservationService.reserve("user1", "book2");
+        List<Reservation> user1Reservations = reservationService.listReservations("user1");
+        assertEquals(2, user1Reservations.size());
+        assertTrue(user1Reservations.stream().allMatch(r -> r.getUserId().equals("user1")));
+    }
 
 
 
