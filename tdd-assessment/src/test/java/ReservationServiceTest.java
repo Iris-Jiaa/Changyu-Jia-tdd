@@ -34,6 +34,14 @@ public class ReservationServiceTest {
             reservationService.reserve("user2", "book2");
         });
     }
+    @Test
+    void reserve_whenBookNotFound() {
+        String userId = "user1";
+        String nonExistentBookId = "nonexistent";
+        assertThrows(IllegalArgumentException.class, 
+            () -> reservationService.reserve(userId, nonExistentBookId));
+}
+
 
 
 }
