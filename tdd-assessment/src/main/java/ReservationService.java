@@ -17,6 +17,9 @@ already reserved.
 */ 
     public void reserve(String userId, String bookId) { 
         Book book = bookRepo.findById(bookId);
+        if (book == null) {
+            throw new IllegalArgumentException("Book not found: " + bookId);
+        }
         if (book.getCopies() <= 0) {
             throw new NoAvailableCopiesException("No copies available");
         }
