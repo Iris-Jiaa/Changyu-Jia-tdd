@@ -30,7 +30,7 @@ public class ReservationServiceTest {
     void reserve_fails_whenNoCopiesAvailable() {
         Book book = new Book("book2", "Title", 0);
         bookRepo.save(book);
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(NoAvailableCopiesException.class, () -> {
             reservationService.reserve("user2", "book2");
         });
     }
