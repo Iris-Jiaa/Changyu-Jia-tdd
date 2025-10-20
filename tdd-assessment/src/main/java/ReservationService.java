@@ -34,8 +34,11 @@ already reserved.
 * Cancel an existing reservation for a user. 
 * Throws IllegalArgumentException if no such reservation exists. 
 */ 
-    public void cancel(String userId, String bookId) { 
-        // TODO: Implement using TDD 
+    public void cancel(String userId, String bookId) {
+        reservationRepo.delete(userId, bookId);
+        Book book = bookRepo.findById(bookId);
+        book.setCopies(book.getCopies() + 1);
+        bookRepo.save(book);
     } 
 /** 
 * List all active reservations for a given user. 
