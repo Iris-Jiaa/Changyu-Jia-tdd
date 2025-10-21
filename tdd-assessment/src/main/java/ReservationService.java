@@ -53,7 +53,7 @@ already reserved.
 * list all reservations for a book. 
 */ 
     public List<Reservation> listReservationsForBook(String bookId) { 
-        return null; 
+        return reservationRepo.findByBook(bookId); 
     } 
 } 
 
