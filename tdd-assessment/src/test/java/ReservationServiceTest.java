@@ -120,4 +120,11 @@ public class ReservationServiceTest {
         assertEquals(1, books.findById("book1").getCopiesAvailable());
         assertFalse(reservations.existsByUserAndBook("user1","book1"));
     }
+    @Test // boundary test: 13. reserve fails when copies is negative
+    void reserve_fails_whenCopiesIsNegative() {
+        Book book = new Book("book2", "Title", -1);
+        bookRepo.save(book);
+        assertThrows(IllegalStateException.class,
+            () -> reservationService.reserve("user2", "book2"));
+    }
 }
