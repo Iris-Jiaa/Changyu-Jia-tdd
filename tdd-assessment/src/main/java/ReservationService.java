@@ -47,14 +47,12 @@ already reserved.
 * List all active reservations for a given user. 
 */ 
     public List<Reservation> listReservations(String userId) { 
-        // TODO: Implement using TDD 
-        return null; 
+        return reservationRepo.findByUser(userId); 
     } 
 /** 
 * list all reservations for a book. 
 */ 
     public List<Reservation> listReservationsForBook(String bookId) { 
-        // TODO: Implement using TDD 
         return null; 
     } 
 } 
