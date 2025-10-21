@@ -1,12 +1,21 @@
 package src.main.java;
 
 public class User {
-    private final String id;
-    private final String name;
+    private String id;
+    private String name;
+    private boolean priority;
 
     public User(String id, String name) {
         this.id = id;
         this.name = name;
+    }
+
+    public boolean isPriority() {
+        return priority;
+    }
+
+    public void setPriority(boolean priority) {
+        this.priority = priority;
     }
 
     public String getId() {

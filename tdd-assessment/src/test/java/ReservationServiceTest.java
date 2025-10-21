@@ -19,7 +19,7 @@ public class ReservationServiceTest {
         reservationRepo = new MemoryReservationRepository();
         reservationService = new ReservationService(bookRepo, reservationRepo);
     }
-    
+    //Part B
     @Test // 1. happy path
     void reserve_succeeds_whenCopiesAvailable() {
         Book book = new Book("book1", "Some Title", 2);
@@ -127,4 +127,6 @@ public class ReservationServiceTest {
         assertThrows(IllegalStateException.class,
             () -> reservationService.reserve("user2", "book2"));
     }
+
+    //Part C
 }
