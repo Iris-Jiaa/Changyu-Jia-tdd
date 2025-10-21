@@ -89,6 +89,25 @@ public class ReservationServiceTest {
         assertEquals(2, bookReservations.size());
         assertTrue(bookReservations.stream().allMatch(r -> r.getBookId().equals("book1")));
     }
-    
+    @Test // boundary test: 9. reserve the last copy
+    void reserve_whenReserveLastCopy() {
+        Book book = new Book("book1", "Test Book", 1);
+        bookRepo.save(book);
+        reservationService.reserve("user1", "book1");
+        assertTrue(reservationRepo.existsByUserAndBook("user1", "book1"));
+        assertEquals(0, bookRepo.findById("book1").getCopies());
+        assertThrows(IllegalStateException.class,
+            () -> reservationService.reserve("user2", "book1"));
+    }
+    @Test // boundary test: 10. list reservations for a user with no reservations
+    void listReservations_userWithNoReservations() {
+        List<Reservation> reservations = reservationService.listReservations("U999");
+        assertTrue(reservations.isEmpty());
+    }
+    @Test // boundary test: 11. list reservations for a book with no reservations
+    void listReservations_bookWithNoReservations() {
+        List<Reservation> reservations = reservationService.listReservationsForBook("B001");
+        assertTrue(reservations.isEmpty());
+    }
 }
 
