@@ -25,7 +25,7 @@ public class ReservationServiceTest {
         Book book = new Book("book1", "Some Title", 2);
         bookRepo.save(book);
         reservationService.reserve("user1", "book1");
-        assertEquals(1, bookRepo.findById("book1").getCopies());
+        assertEquals(1, bookRepo.findById("book1").getCopiesAvailable());
         assertTrue(reservationRepo.existsByUserAndBook("user1", "book1"));
     }
     @Test // 2. no copies available
@@ -55,9 +55,9 @@ public class ReservationServiceTest {
         bookRepo.save(book);
 
         reservationService.reserve(userId, "book1");
-        assertEquals(1, bookRepo.findById("book1").getCopies());
+        assertEquals(1, bookRepo.findById("book1").getCopiesAvailable());
         reservationService.cancel(userId, "book1");
-        assertEquals(2, bookRepo.findById("book1").getCopies());
+        assertEquals(2, bookRepo.findById("book1").getCopiesAvailable());
     }
     @Test // 6. cancel reservation fails when no such reservation exists
     void cancel_whenUserExistsButNoReservation() {
@@ -95,7 +95,7 @@ public class ReservationServiceTest {
         bookRepo.save(book);
         reservationService.reserve("user1", "book1");
         assertTrue(reservationRepo.existsByUserAndBook("user1", "book1"));
-        assertEquals(0, bookRepo.findById("book1").getCopies());
+        assertEquals(0, bookRepo.findById("book1").getCopiesAvailable());
         assertThrows(IllegalStateException.class,
             () -> reservationService.reserve("user2", "book1"));
     }
@@ -117,7 +117,7 @@ public class ReservationServiceTest {
         var service = new ReservationService(books, reservations);
         service.reserve("user1", "book1");
         service.cancel("user1", "book1");
-        assertEquals(1, books.findById("book1").getCopies());
+        assertEquals(1, books.findById("book1").getCopiesAvailable());
         assertFalse(reservations.existsByUserAndBook("user1","book1"));
     }
 }

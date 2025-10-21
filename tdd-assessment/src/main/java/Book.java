@@ -19,11 +19,11 @@ public class Book {
         return title;
     }
 
-    public int getCopies() {
+    public int getCopiesAvailable() {
         return copiesAvailable;
     }
 
-    public void setCopies(int copies) {
+    public void setCopiesAvailable(int copies) {
         this.copiesAvailable = copies;
     }
 }

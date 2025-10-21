@@ -20,13 +20,13 @@ already reserved.
         if (book == null) {
             throw new IllegalArgumentException("Book not found: " + bookId);
         }
-        if (book.getCopies() <= 0) {
+        if (book.getCopiesAvailable() <= 0) {
             throw new IllegalStateException("No copies available");
         }
         if (reservationRepo.existsByUserAndBook(userId, bookId)) {
             throw new IllegalStateException("User already reserved this book");
         }
-        book.setCopies(book.getCopies() - 1);
+        book.setCopiesAvailable(book.getCopiesAvailable() - 1);
         bookRepo.save(book);
         reservationRepo.save(new Reservation(userId, bookId));
     } 
@@ -40,7 +40,7 @@ already reserved.
         }
         reservationRepo.delete(userId, bookId);
         Book book = bookRepo.findById(bookId);
-        book.setCopies(book.getCopies() + 1);
+        book.setCopiesAvailable(book.getCopiesAvailable() + 1);
         bookRepo.save(book);
     } 
 /** 
