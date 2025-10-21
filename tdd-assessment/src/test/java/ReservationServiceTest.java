@@ -101,13 +101,23 @@ public class ReservationServiceTest {
     }
     @Test // boundary test: 10. list reservations for a user with no reservations
     void listReservations_userWithNoReservations() {
-        List<Reservation> reservations = reservationService.listReservations("U999");
+        List<Reservation> reservations = reservationService.listReservations("user1");
         assertTrue(reservations.isEmpty());
     }
     @Test // boundary test: 11. list reservations for a book with no reservations
     void listReservations_bookWithNoReservations() {
-        List<Reservation> reservations = reservationService.listReservationsForBook("B001");
+        List<Reservation> reservations = reservationService.listReservationsForBook("book1");
         assertTrue(reservations.isEmpty());
     }
+    @Test // boundary test: 12. cancel reservation when copies are zero
+    void cancel_copiesFromZeroToOne() {
+        var books = new MemoryBookRepository();
+        var reservations = new MemoryReservationRepository();
+        books.save(new Book("book1", "title", 1));
+        var service = new ReservationService(books, reservations);
+        service.reserve("user1", "book1");
+        service.cancel("user1", "book1");
+        assertEquals(1, books.findById("book1").getCopies());
+        assertFalse(reservations.existsByUserAndBook("user1","book1"));
+    }
 }
-
