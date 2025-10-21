@@ -79,6 +79,17 @@ public class ReservationServiceTest {
         assertEquals(2, user1Reservations.size());
         assertTrue(user1Reservations.stream().allMatch(r -> r.getUserId().equals("user1")));
     }
+    @Test // 8. list reservations for a book
+    void listReservations_bookReservations() {
+        Book book = new Book("book1", "Book 1", 2);
+        bookRepo.save(book);
+        reservationService.reserve("user1", "book1");
+        reservationService.reserve("user2", "book1");
+        List<Reservation> bookReservations = reservationService.listReservationsForBook("book1");
+        assertEquals(2, bookReservations.size());
+        assertTrue(bookReservations.stream().allMatch(r -> r.getBookId().equals("book1")));
+    }
+
 
 
 
