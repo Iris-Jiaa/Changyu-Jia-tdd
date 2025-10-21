@@ -32,7 +32,7 @@ public class ReservationServiceTest {
     void reserve_fails_whenNoCopiesAvailable() {
         Book book = new Book("book2", "Title", 0);
         bookRepo.save(book);
-        assertThrows(NoAvailableCopiesException.class,
+        assertThrows(IllegalStateException.class,
             () -> reservationService.reserve("user2", "book2"));
     }
     @Test // 3. book not found
@@ -89,9 +89,6 @@ public class ReservationServiceTest {
         assertEquals(2, bookReservations.size());
         assertTrue(bookReservations.stream().allMatch(r -> r.getBookId().equals("book1")));
     }
-
-
-
-
+    
 }
 

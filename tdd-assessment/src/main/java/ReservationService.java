@@ -21,7 +21,7 @@ already reserved.
             throw new IllegalArgumentException("Book not found: " + bookId);
         }
         if (book.getCopies() <= 0) {
-            throw new NoAvailableCopiesException("No copies available");
+            throw new IllegalStateException("No copies available");
         }
         if (reservationRepo.existsByUserAndBook(userId, bookId)) {
             throw new IllegalStateException("User already reserved this book");
