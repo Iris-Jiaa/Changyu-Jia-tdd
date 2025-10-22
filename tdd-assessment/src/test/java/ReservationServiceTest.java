@@ -25,6 +25,8 @@ public class ReservationServiceTest {
     @Test // 1. happy path
     void reserve_succeeds_whenCopiesAvailable() {
         Book book = new Book("book1", "Some Title", 2);
+        User user= new User("user1", "User");
+        userRepo.save(user);
         bookRepo.save(book);
         reservationService.reserve("user1", "book1");
         assertEquals(1, bookRepo.findById("book1").getCopiesAvailable());
@@ -33,9 +35,11 @@ public class ReservationServiceTest {
     @Test // 2. no copies available
     void reserve_fails_whenNoCopiesAvailable() {
         Book book = new Book("book2", "Title", 0);
+        User user= new User("user1", "User");
+        userRepo.save(user);
         bookRepo.save(book);
         assertThrows(IllegalStateException.class,
-            () -> reservationService.reserve("user2", "book2"));
+            () -> reservationService.reserve("user1", "book2"));
     }
     @Test // 3. book not found
     void reserve_whenBookNotFound() {
@@ -45,6 +49,8 @@ public class ReservationServiceTest {
     @Test // 4.  A user cannot reserve the same book twice. 
     void reserve_whenUserAlreadyReserved() {
         Book book = new Book("book1", "Test Book", 2);
+        User user= new User("user1", "User");
+        userRepo.save(user);
         bookRepo.save(book);
         reservationService.reserve("user1", "book1");
         assertThrows(IllegalStateException.class, 
@@ -56,7 +62,7 @@ public class ReservationServiceTest {
         Book book = new Book("book1", "Test Book", 2);
         bookRepo.save(book);
 
-        reservationService.reserve(userId, "book1");
+        reservationService.reserve("user1", "book1");
         assertEquals(1, bookRepo.findById("book1").getCopiesAvailable());
         reservationService.cancel(userId, "book1");
         assertEquals(2, bookRepo.findById("book1").getCopiesAvailable());
@@ -64,6 +70,8 @@ public class ReservationServiceTest {
     @Test // 6. cancel reservation fails when no such reservation exists
     void cancel_whenUserExistsButNoReservation() {
         Book book = new Book("book1", "Test Book", 1);
+        User user= new User("user1", "User");
+        userRepo.save(user);
         bookRepo.save(book);
     
         assertThrows(IllegalArgumentException.class, 
@@ -95,11 +103,13 @@ public class ReservationServiceTest {
     void reserve_whenReserveLastCopy() {
         Book book = new Book("book1", "Test Book", 1);
         bookRepo.save(book);
+        User user= new User("user1", "User");
+        userRepo.save(user);
         reservationService.reserve("user1", "book1");
         assertTrue(reservationRepo.existsByUserAndBook("user1", "book1"));
         assertEquals(0, bookRepo.findById("book1").getCopiesAvailable());
         assertThrows(IllegalStateException.class,
-            () -> reservationService.reserve("user2", "book1"));
+            () -> reservationService.reserve("user1", "book1"));
     }
     @Test // boundary test: 10. list reservations for a user with no reservations
     void listReservations_userWithNoReservations() {
@@ -126,6 +136,8 @@ public class ReservationServiceTest {
     void reserve_fails_whenCopiesIsNegative() {
         Book book = new Book("book2", "Title", -1);
         bookRepo.save(book);
+        User user= new User("user2", "User");
+        userRepo.save(user);
         assertThrows(IllegalStateException.class,
             () -> reservationService.reserve("user2", "book2"));
     }
@@ -141,5 +153,16 @@ public class ReservationServiceTest {
         reservationService.reserve("user1", "book1");
         assertTrue(reservationRepo.existsByUserAndBook("user1", "book1"));
         assertEquals(1, bookRepo.findById("book1").getCopiesAvailable());
-}
+    }
+    @Test // 2. priority user attempts to reserve when no copies are available
+    void reserve_priorityUserWithNoCopies() {
+        Book book = new Book("book1", "Title", 0);
+        User priorityUser = new User("user1", "Priority User", true);
+        bookRepo.save(book);
+        userRepo.save(priorityUser);
+        reservationService.reserve("user1", "book1");
+        assertFalse(reservationRepo.existsByUserAndBook("user1", "book1"));
+        assertTrue(reservationService.isUserInWaitingList("user1", "book1"));
+        assertEquals(0, bookRepo.findById("book1").getCopiesAvailable());
+    }
 }
