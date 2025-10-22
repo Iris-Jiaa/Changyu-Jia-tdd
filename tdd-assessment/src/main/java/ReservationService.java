@@ -4,9 +4,11 @@ import java.util.List;
 public class ReservationService { 
     private final IBookRepository bookRepo; 
     private final IReservationRepository reservationRepo; 
-    public ReservationService(IBookRepository bookRepo, 
-    IReservationRepository reservationRepo) { 
+    private final IUserRepository userRepo;
+    public ReservationService(IBookRepository bookRepo, IUserRepository userRepo,
+        IReservationRepository reservationRepo) { 
         this.bookRepo = bookRepo; 
+        this.userRepo = userRepo;
         this.reservationRepo = reservationRepo; 
     }   
 /** 
@@ -26,9 +28,9 @@ already reserved.
         if (reservationRepo.existsByUserAndBook(userId, bookId)) {
             throw new IllegalStateException("User already reserved this book");
         }
-        book.setCopiesAvailable(book.getCopiesAvailable() - 1);
-        bookRepo.save(book);
-        reservationRepo.save(new Reservation(userId, bookId));
+            book.setCopiesAvailable(book.getCopiesAvailable() - 1);
+            bookRepo.save(book);
+            reservationRepo.save(new Reservation(userId, bookId));
     } 
 /** 
 * Cancel an existing reservation for a user. 
