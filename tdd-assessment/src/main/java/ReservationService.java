@@ -61,6 +61,12 @@ already reserved.
         reservationRepo.delete(userId, bookId);
         Book book = bookRepo.findById(bookId);
         book.setCopiesAvailable(book.getCopiesAvailable() + 1);
+        Queue<String> waitingList = waitingLists.get(bookId);
+        if (waitingList != null && !waitingList.isEmpty()) {
+            String waitingUserId = waitingList.poll();
+            reservationRepo.save(new Reservation(waitingUserId, bookId));
+            book.setCopiesAvailable(book.getCopiesAvailable() - 1);
+        }
         bookRepo.save(book);
     } 
 /** 
