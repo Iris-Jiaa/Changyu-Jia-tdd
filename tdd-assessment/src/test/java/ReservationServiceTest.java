@@ -174,4 +174,22 @@ public class ReservationServiceTest {
         assertThrows(IllegalStateException.class, 
             () -> reservationService.reserve("user1", "book1"));
     }
+    @Test // 4. cancel reservation triggers auto-reserve for priority user in waiting list
+    void cancel_autoToInWaitingList() {
+        Book book = new Book("book1", "Title", 1);
+        User user1 = new User("user1", "regular user");
+        User priorityUser = new User("user2", "priority user", true);
+    
+        bookRepo.save(book);
+        userRepo.save(user1);
+        userRepo.save(priorityUser);
+
+        reservationService.reserve("user1", "book1");
+        reservationService.reserve("user2", "book1");
+        reservationService.cancel("user1", "book1");
+
+        assertFalse(reservationRepo.existsByUserAndBook("user1", "book1"));
+        assertTrue(reservationRepo.existsByUserAndBook("user2", "book1"));
+        assertEquals(0, bookRepo.findById("book1").getCopiesAvailable());
+    }
 }
