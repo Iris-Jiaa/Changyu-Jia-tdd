@@ -165,4 +165,13 @@ public class ReservationServiceTest {
         assertTrue(reservationService.isUserInWaitingList("user1", "book1"));
         assertEquals(0, bookRepo.findById("book1").getCopiesAvailable());
     }
+    @Test // 3. regular user attempts to reserve when no copies are available
+    void reserve_regularUserWithNoCopies() {
+        Book book = new Book("book1", "Title", 0);
+        User regularUser = new User("user1", "Regular User", false);
+        bookRepo.save(book);
+        userRepo.save(regularUser);
+        assertThrows(IllegalStateException.class, 
+            () -> reservationService.reserve("user1", "book1"));
+    }
 }
