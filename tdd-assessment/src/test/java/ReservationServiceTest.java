@@ -10,14 +10,16 @@ import src.main.java.*;
 
 public class ReservationServiceTest {
     private IBookRepository bookRepo;
+    private IUserRepository userRepo;
     private IReservationRepository reservationRepo;
     private ReservationService reservationService;
 
     @BeforeEach
     void setUp() {
         bookRepo = new MemoryBookRepository();
+        userRepo = new MemoryUserRepository();
         reservationRepo = new MemoryReservationRepository();
-        reservationService = new ReservationService(bookRepo, reservationRepo);
+        reservationService = new ReservationService(bookRepo, userRepo, reservationRepo);
     }
     //Part B
     @Test // 1. happy path
@@ -114,7 +116,7 @@ public class ReservationServiceTest {
         var books = new MemoryBookRepository();
         var reservations = new MemoryReservationRepository();
         books.save(new Book("book1", "title", 1));
-        var service = new ReservationService(books, reservations);
+        var service = new ReservationService(books, userRepo, reservations);
         service.reserve("user1", "book1");
         service.cancel("user1", "book1");
         assertEquals(1, books.findById("book1").getCopiesAvailable());
@@ -129,4 +131,15 @@ public class ReservationServiceTest {
     }
 
     //Part C
+    @Test // 1. priority user reserves when copies are available
+    void reserve_priorityUserWithAvailableCopies() {
+        Book book = new Book("book1", "Book", 2);
+        User priorityUser = new User("user1", "Priority User", true);
+        bookRepo.save(book);
+        userRepo.save(priorityUser);
+
+        reservationService.reserve("user1", "book1");
+        assertTrue(reservationRepo.existsByUserAndBook("user1", "book1"));
+        assertEquals(1, bookRepo.findById("book1").getCopiesAvailable());
+}
 }
