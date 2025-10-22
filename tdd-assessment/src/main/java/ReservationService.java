@@ -1,10 +1,15 @@
 package src.main.java;
 
-import java.util.List; 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue; 
 public class ReservationService { 
     private final IBookRepository bookRepo; 
     private final IReservationRepository reservationRepo; 
     private final IUserRepository userRepo;
+    private final Map<String, Queue<String>> waitingLists = new HashMap<>();
     public ReservationService(IBookRepository bookRepo, IUserRepository userRepo,
         IReservationRepository reservationRepo) { 
         this.bookRepo = bookRepo; 
@@ -22,16 +27,29 @@ already reserved.
         if (book == null) {
             throw new IllegalArgumentException("Book not found: " + bookId);
         }
-        if (book.getCopiesAvailable() <= 0) {
-            throw new IllegalStateException("No copies available");
-        }
         if (reservationRepo.existsByUserAndBook(userId, bookId)) {
             throw new IllegalStateException("User already reserved this book");
+        }
+        if (book.getCopiesAvailable() <= 0) {
+            if (userRepo.findById(userId).isPriority()) {
+                addToWaitingList(userId, bookId);
+                return;
+            }else{
+                throw new IllegalStateException("No copies available");
+            }
         }
             book.setCopiesAvailable(book.getCopiesAvailable() - 1);
             bookRepo.save(book);
             reservationRepo.save(new Reservation(userId, bookId));
     } 
+    private void addToWaitingList(String userId, String bookId) {
+        waitingLists.putIfAbsent(bookId, new LinkedList<>());
+        waitingLists.get(bookId).add(userId);
+    }
+
+    public boolean isUserInWaitingList(String userId, String bookId) {
+        return waitingLists.containsKey(bookId) && waitingLists.get(bookId).contains(userId);
+    }
 /** 
 * Cancel an existing reservation for a user. 
 * Throws IllegalArgumentException if no such reservation exists. 
