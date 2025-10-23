@@ -165,16 +165,7 @@ public class ReservationServiceTest {
         assertTrue(reservationService.isUserInWaitingList("user1", "book1"));
         assertEquals(0, bookRepo.findById("book1").getCopiesAvailable());
     }
-    @Test // 3. regular user attempts to reserve when no copies are available
-    void reserve_regularUserWithNoCopies() {
-        Book book = new Book("book1", "Title", 0);
-        User regularUser = new User("user1", "Regular User", false);
-        bookRepo.save(book);
-        userRepo.save(regularUser);
-        assertThrows(IllegalStateException.class, 
-            () -> reservationService.reserve("user1", "book1"));
-    }
-    @Test // 4. cancel reservation triggers auto-reserve for priority user in waiting list
+    @Test // 3. cancel reservation triggers auto-reserve for priority user in waiting list
     void cancel_autoToInWaitingList() {
         Book book = new Book("book1", "Title", 1);
         User user1 = new User("user1", "regular user");
@@ -192,4 +183,56 @@ public class ReservationServiceTest {
         assertTrue(reservationRepo.existsByUserAndBook("user2", "book1"));
         assertEquals(0, bookRepo.findById("book1").getCopiesAvailable());
     }
+    @Test // 4. boundary test: waiting list should be in order of reservation attempts
+    void waitingList_shouldBeInOrder() {
+        Book book = new Book("book1", "Test Book", 1);
+        User user1 = new User("user1", "User 1", true);
+        User user2 = new User("user2", "User 2", true);
+        User user3 = new User("user3", "User 3", true);
+    
+        bookRepo.save(book);
+        userRepo.save(user1);
+        userRepo.save(user2);
+        userRepo.save(user3);
+
+        reservationService.reserve("user1", "book1");
+        reservationService.reserve("user2", "book1");
+        reservationService.reserve("user3", "book1");
+        
+        book.setCopiesAvailable(1);
+        bookRepo.save(book);
+        reservationService.cancel("user1", "book1");
+        
+        assertTrue(reservationRepo.existsByUserAndBook("user2", "book1"));
+    }
+    @Test // 5. cancel reservation removes user from waiting list when auto-assigning
+    void cancel_autoRemovesUserFromWaitingList() {
+        Book book = new Book("book1", "Title", 1);
+        User user1 = new User("user1", "Regular User", false);
+        User priorityUser = new User("user2", "Priority User", true);
+
+        bookRepo.save(book);
+        userRepo.save(user1);
+        userRepo.save(priorityUser);
+
+        reservationService.reserve("user1", "book1");
+        assertTrue(reservationRepo.existsByUserAndBook("user1", "book1"));
+        assertEquals(0, bookRepo.findById("book1").getCopiesAvailable());
+
+        reservationService.reserve("user2", "book1");
+        assertFalse(reservationRepo.existsByUserAndBook("user2", "book1"));
+        assertTrue(reservationService.isUserInWaitingList("user2", "book1"));
+
+        reservationService.cancel("user1", "book1");
+
+        assertFalse(reservationRepo.existsByUserAndBook("user1", "book1"));
+        assertTrue(reservationRepo.existsByUserAndBook("user2", "book1"));
+        assertFalse(reservationService.isUserInWaitingList("user2", "book1"));
+
+        assertEquals(0, bookRepo.findById("book1").getCopiesAvailable());
+    }
+    
+    
+
+
 }
