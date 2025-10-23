@@ -24,12 +24,7 @@ already reserved.
 */ 
     public void reserve(String userId, String bookId) { 
         Book book = bookRepo.findById(bookId);
-        if (book == null) {
-            throw new IllegalArgumentException("Book not found: " + bookId);
-        }
-        if (reservationRepo.existsByUserAndBook(userId, bookId)) {
-            throw new IllegalStateException("User already reserved this book");
-        }
+        validateReservation(userId, bookId);
         if (book.getCopiesAvailable() <= 0) {
             if (userRepo.findById(userId).isPriority()) {
                 addToWaitingList(userId, bookId);
@@ -42,6 +37,16 @@ already reserved.
             bookRepo.save(book);
             reservationRepo.save(new Reservation(userId, bookId));
     } 
+    // Validate reservation conditions
+    private void validateReservation(String userId, String bookId) {
+        Book book = bookRepo.findById(bookId);
+        if (book == null) {
+            throw new IllegalArgumentException("Book not found: " + bookId);
+        }
+        if (reservationRepo.existsByUserAndBook(userId, bookId)) {
+            throw new IllegalStateException("User already reserved this book");
+        }
+    }
     private void addToWaitingList(String userId, String bookId) {
         waitingLists.putIfAbsent(bookId, new LinkedList<>());
         waitingLists.get(bookId).add(userId);
@@ -61,14 +66,18 @@ already reserved.
         reservationRepo.delete(userId, bookId);
         Book book = bookRepo.findById(bookId);
         book.setCopiesAvailable(book.getCopiesAvailable() + 1);
+        processWaitingList(bookId, book);
+        bookRepo.save(book);
+    } 
+    // Process the waiting list when a reservation is canceled
+    private void processWaitingList(String bookId, Book book) {
         Queue<String> waitingList = waitingLists.get(bookId);
         if (waitingList != null && !waitingList.isEmpty()) {
             String waitingUserId = waitingList.poll();
             reservationRepo.save(new Reservation(waitingUserId, bookId));
             book.setCopiesAvailable(book.getCopiesAvailable() - 1);
         }
-        bookRepo.save(book);
-    } 
+    }
 /** 
 * List all active reservations for a given user. 
 */ 
